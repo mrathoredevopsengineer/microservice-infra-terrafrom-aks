@@ -1,11 +1,9 @@
-name: 'Terraform CI/CD' # Triggering workflow after secret update
+name: 'Terraform Apply' # Triggering workflow after secret update
 
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
+
 
 permissions:
   id-token: write # Required for OIDC authentication
