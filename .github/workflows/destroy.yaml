@@ -2,7 +2,11 @@ name: Terraform Destroy
 
 on:
   workflow_dispatch:
-
+    inputs:
+      confirmation:
+        description: Type DESTROY to confirm infrastructure deletion
+        required: true
+        type: string
 
 permissions:
   id-token: write
@@ -19,16 +23,18 @@ jobs:
   destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
-    environment: terraform-destroy
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Verify confirmation
         if: ${{ github.event.inputs.confirmation != 'DESTROY' }}
         run: |
           echo "Confirmation must be exactly DESTROY."
           exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Azure Login
         uses: azure/login@v2
@@ -42,16 +48,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -input=false
-        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Destroy Plan
         run: terraform plan -destroy -input=false -var-file=terraform.tfvars -out=destroy.tfplan
-        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Destroy
         run: terraform apply -input=false destroy.tfplan
-        working-directory: ${{ env.TF_WORKING_DIR }}
