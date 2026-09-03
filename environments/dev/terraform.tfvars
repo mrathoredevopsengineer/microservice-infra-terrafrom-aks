@@ -18,7 +18,7 @@ infra_config = {
       default_node_pool = {
         name       = "default"
         node_count = 2
-        vm_size    = "Standard_B4s"
+        vm_size    = "Standard_D4s_v3"
       }
     }
   }
